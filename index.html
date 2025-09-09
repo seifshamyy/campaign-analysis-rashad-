@@ -1,12 +1,11 @@
-<!doctype html>
-<html lang="en" dir="ltr">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<html lang="en" dir="ltr"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Campaigns Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&amp;display=swap" rel="stylesheet">
 <style>
+
   :root{
     --bg:#0b0f0c;
     --panel:#0e1411;
@@ -136,16 +135,17 @@
   .kpi .card{padding:12px}
   .kpi .card h3{margin:0 0 2px 0;font-size:12px;color:#c6e9d4;text-transform:uppercase;letter-spacing:.3px}
   .kpi .card div{font-weight:800;font-size:18px;color:#e8fff3}
+
 </style>
-</head>
+<!--UIPATH_EXTENSION_ID: conkfbpnllelocpogdmbilgmnkabjfmf--></head>
 <body>
   <div class="shell">
     <div class="hero">
       <div>
-        <div class="title">Hey Mohamed! Let’s see how we can make your ads better.</div>
+        <div class="title">Hey Mohamed, let's see how we can make your ads better.</div>
         <div class="subtitle">Live campaign directory with analysis on demand</div>
       </div>
-      <div class="pill" id="statusPill">Idle</div>
+      <div class="pill" id="statusPill">Ready</div>
     </div>
 
     <section class="panel">
@@ -156,25 +156,54 @@
             <div class="row" style="margin-bottom:10px">
               <label>Search</label>
               <div class="search" style="width:100%">
-                <input id="searchInput" type="text" placeholder="Filter by ID or name…" autocomplete="off" />
+                <input id="searchInput" type="text" placeholder="Filter by ID or name…" autocomplete="off">
                 <button class="btn secondary" id="loadBtn">Load Campaigns</button>
               </div>
             </div>
             <div class="split" style="margin-bottom:10px">
-              <div class="stat"><span class="small">Loaded</span> <span class="count" id="loadedCount">0</span> <span class="small">campaigns</span></div>
-              <div class="stat"><span class="small">Filtered</span> <span class="count" id="filteredCount">0</span></div>
+              <div class="stat"><span class="small">Loaded</span> <span class="count" id="loadedCount">58</span> <span class="small">campaigns</span></div>
+              <div class="stat"><span class="small">Filtered</span> <span class="count" id="filteredCount">58</span></div>
             </div>
-            <select id="campaignList" class="list" size="12"></select>
+            <select id="campaignList" class="list" size="12"><option value="120200872447820134">120200872447820134 — Bestlife face</option><option value="120201121312910134">120201121312910134 — New messages campaign</option><option value="120201760433330264">120201760433330264 — Post: ‎"‎#دامتوندا ‎"‎</option><option value="120202096349800264">120202096349800264 — ‎New messages campaign celery سيليري‎ – Copy</option><option value="120203421466510652">120203421466510652 — New Engagement Campaign</option><option value="120203872501860620">120203872501860620 — New messages campaign</option><option value="120203961121960426">120203961121960426 — Damtonda</option><option value="120205101347840264">120205101347840264 — حملة إعلانية جديدة بهدف التفاعل</option><option value="120205112813140032">120205112813140032 — New messages campaign</option><option value="120205400644000032">120205400644000032 — حملة إعلانية جديدة بهدف المبيعات</option><option value="120205933860940652">120205933860940652 — منشور Instagram: ‏#سيليرى_الشديد_رجع_من_جديد#...</option><option value="120205933864770652">120205933864770652 — منشور Instagram: ‏#سيليرى_الشديد_رجع_من_جديد#...</option><option value="120206169780790652">120206169780790652 — منشور Instagram: ‏#دامتوندا_اختيار_النجوم راى...</option><option value="120206404225690652">120206404225690652 — حملة إعلانية جديدة بهدف التفاعل</option><option value="120206559675960264">120206559675960264 — ‎سيليرى‎ – Copy</option><option value="120206941969420205">120206941969420205 — Bestlife_eg</option><option value="120207574349060443">120207574349060443 — Damtonda pharma</option><option value="120208733981150264">120208733981150264 — New messages campaign – Copy</option><option value="120209589629110311">120209589629110311 — [03/11/2024] Promoting Bestlifeeg_</option><option value="120209865153000264">120209865153000264 — New messages campaign – Copy</option><option value="120211642915900620">120211642915900620 — Damtonda pha5</option><option value="120211734026840443">120211734026840443 — حملة إعلانية جديدة بهدف التفاعل</option><option value="120211857813720032">120211857813720032 — Damtonda official</option><option value="120212280479330609">120212280479330609 — Post: ‎"‎🏠 عرض محدود! 🏠‎"‎</option><option value="120215307519530169">120215307519530169 — ‎حملة إعلانية جديدة بهدف التفاعل‎ – Copy</option><option value="120215465111260155">120215465111260155 — Bestlife_eg – Copy</option><option value="120217023569650011">120217023569650011 — New Engagement Campaign – Copy</option><option value="120219580882350311">120219580882350311 — New Engagement Campaign – Copy</option><option value="120224182978380205">120224182978380205 — New Engagement Campaign – Copy</option><option value="120225101522530205">120225101522530205 — New Engagement Campaign – Copy</option><option value="120225120224650205">120225120224650205 — New Engagement Campaign – Copy</option><option value="120226924855190426">120226924855190426 — ‏جذب رسائل مخصصة للحملة الإعلانية‏ ‏٠١/٠٧/٢٠٢٥‏ ‏حملة إعلانية‏</option><option value="120227027208530620">120227027208530620 — حملة إعلانية جديدة بهدف التفاعل</option><option value="120227428469370529">120227428469370529 — Damtonda</option><option value="120227818865540529">120227818865540529 — حملة إعلانية جديدة بهدف التفاعل</option><option value="120228971549820264">120228971549820264 — Lipofit official</option><option value="120229097165990264">120229097165990264 — New Engagement Campaign</option><option value="120230303478820205">120230303478820205 — حملة إعلانية جديدة بهدف التفاعل</option><option value="120230385756840205">120230385756840205 — ‎‎‎منشور Instagram: ‏🛑 اوعي تستخدمي Lipo Fit! إلا لو...‎ – Copy‎ – Copy‎ – Copy</option><option value="120230706616570205">120230706616570205 — حملة إعلانية جديدة بهدف المبيعات</option><option value="120230828956290155">120230828956290155 — Instagram post: ‎#ليبوفيت# شكراا جدا لراي حضرتك...</option><option value="120231102152700279">120231102152700279 — New Engagement Campaign – Copy</option><option value="120231647263390032">120231647263390032 — حملة إعلانية جديدة بهدف التفاعل</option><option value="120231695724050032">120231695724050032 — New Engagement Campaign</option><option value="120232093982540279">120232093982540279 — New messages campaign</option><option value="120232260036110169">120232260036110169 — New Engagement Campaign</option><option value="23851627693110168">23851627693110168 — حملة إعلانية جديدة بهدف التفاعل</option><option value="23857530736980168">23857530736980168 — New Engagement campaign – Copy</option><option value="23857666723630651">23857666723630651 — Bestlifeeg</option><option value="23858066666850528">23858066666850528 — : ‎"‎#Damtonda_دامتوندا# ‎"‎</option><option value="23858318573990651">23858318573990651 — Bestlifeeg</option><option value="23858999791060013">23858999791060013 — ‏‎Celery_Zoril‎‏‏</option><option value="23859275282500010">23859275282500010 — حملة إعلانية جديدة بهدف التفاعل سيليري celery</option><option value="23861370128300013">23861370128300013 — Sa7itk2</option><option value="23862456845650013">23862456845650013 — حملة إعلانية جديدة بهدف التفاعل</option><option value="6272649589939">6272649589939 — صحتك مسئوليتك – Message replies</option><option value="6272663337139">6272663337139 — حملة إعلانية جديدة باسم الرسائل</option><option value="6272664659139">6272664659139 — حملة إعلانية جديدة باسم الرسائل</option></select>
             <div class="split" style="margin-top:10px">
               <div>
                 <label>Manual Campaign ID</label>
-                <input id="manualId" type="text" placeholder="Paste a Campaign ID" class="mono" />
+                <input id="manualId" type="text" placeholder="Paste a Campaign ID" class="mono">
               </div>
               <div>
                 <label>Selected Campaign</label>
-                <input id="selectedId" type="text" class="mono" readonly />
+                <input id="selectedId" type="text" class="mono" readonly="">
               </div>
             </div>
+
+            <!-- New: Date Preset dropdown -->
+            <div style="margin-top:10px">
+              <label>Date Preset</label>
+              <select id="datePreset">
+                <option value="today">today</option>
+                <option value="yesterday">yesterday</option>
+                <option value="this_month">this_month</option>
+                <option value="last_month">last_month</option>
+                <option value="this_quarter">this_quarter</option>
+                <option value="maximum">maximum</option>
+                <option value="data_maximum">data_maximum</option>
+                <option value="last_3d">last_3d</option>
+                <option value="last_7d" selected="">last_7d</option>
+                <option value="last_14d">last_14d</option>
+                <option value="last_28d">last_28d</option>
+                <option value="last_30d">last_30d</option>
+                <option value="last_90d">last_90d</option>
+                <option value="last_week_mon_sun">last_week_mon_sun</option>
+                <option value="last_week_sun_sat">last_week_sun_sat</option>
+                <option value="last_quarter">last_quarter</option>
+                <option value="last_year">last_year</option>
+                <option value="this_week_mon_today">this_week_mon_today</option>
+                <option value="this_week_sun_today">this_week_sun_today</option>
+                <option value="this_year">this_year</option>
+              </select>
+            </div>
+            <!-- End new block -->
+
             <div class="actions" style="margin-top:12px">
               <button class="btn" id="analyzeBtn">Analyze</button>
               <button class="btn ghost" id="copyIdBtn">Copy ID</button>
@@ -184,10 +213,10 @@
 
           <div class="card">
             <div class="kpi">
-              <div class="card"><h3>Directory</h3><div id="kpiDir">–</div></div>
+              <div class="card"><h3>Directory</h3><div id="kpiDir">58 loaded</div></div>
               <div class="card"><h3>Platform</h3><div id="kpiPlat">Meta</div></div>
               <div class="card"><h3>Mode</h3><div id="kpiMode">Listing + Analysis</div></div>
-              <div class="card"><h3>Status</h3><div id="kpiStatus">Idle</div></div>
+              <div class="card"><h3>Status</h3><div id="kpiStatus">Ready</div></div>
             </div>
             <div style="margin-top:14px">
               <label>Analysis Output</label>
@@ -226,6 +255,9 @@
   const copyAnalysisBtn = document.getElementById('copyAnalysisBtn');
   const clearAnalysisBtn = document.getElementById('clearAnalysisBtn');
   const downloadBtn = document.getElementById('downloadBtn');
+
+  /* New: capture date preset element */
+  const datePreset = document.getElementById('datePreset');
 
   let campaignsRaw = [];
   let campaignsParsed = [];
@@ -275,7 +307,7 @@
 
   async function fetchJson(url, options={}){
     const controller = new AbortController();
-    const t = setTimeout(()=>controller.abort(), 100000);
+    const t = setTimeout(()=>controller.abort(), 300000);
     try{
       const res = await fetch(url, {mode:'cors', credentials:'omit', cache:'no-store', signal:controller.signal, ...options});
       const text = await res.text();
@@ -399,12 +431,12 @@
     const tryPost = await fetchJson(ANALYSIS_URL, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ campaign_id: campaignId })
+      body: JSON.stringify({ campaign_id: campaignId, ["date preset"]: (datePreset ? datePreset.value : "") })
     });
 
     let result = tryPost;
     if (!tryPost.ok){
-      const url = ANALYSIS_URL + '?campaign_id=' + encodeURIComponent(campaignId);
+      const url = ANALYSIS_URL + '?campaign_id=' + encodeURIComponent(campaignId) + '&' + encodeURIComponent('date preset') + '=' + encodeURIComponent(datePreset ? datePreset.value : '');
       const tryGet = await fetchJson(url, { method:'GET' });
       result = tryGet;
     }
@@ -444,5 +476,6 @@
   loadCampaigns();
 })();
 </script>
-</body>
-</html>
+
+
+</body></html>
