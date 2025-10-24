@@ -23,7 +23,6 @@
       }
     }
   </script>
-
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <!-- Lucide Icons -->
@@ -69,44 +68,16 @@
       </div>
       <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
-          <label class="block text-xs font-semibold text-emerald-900/80 mb-1">Campaigns</label>
-          <div id="campaignFilter" class="relative" data-ms-root="campaigns">
-            <button type="button" class="w-full flex items-center justify-between gap-2 rounded-xl border border-emerald-100 bg-emerald-50/40 px-3 py-2 text-sm font-medium text-emerald-900 focus:outline-none focus:ring-2 focus:ring-brand-gold/40" data-ms-trigger aria-haspopup="listbox" aria-expanded="false">
-              <span data-ms-label>All campaigns</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
-            </button>
-            <div data-ms-dropdown class="absolute left-0 right-0 top-full z-40 mt-2 hidden rounded-2xl border border-emerald-100 bg-white shadow-soft">
-              <div class="border-b border-emerald-100 px-3 py-2">
-                <input type="search" data-ms-search class="w-full rounded-lg border border-emerald-100 bg-emerald-50/40 px-3 py-2 text-sm text-emerald-900 focus:outline-none focus:ring-2 focus:ring-brand-gold/40" placeholder="Search campaigns" autocomplete="off">
-              </div>
-              <div data-ms-options class="max-h-60 overflow-y-auto p-2 space-y-1"></div>
-              <div data-ms-empty class="hidden px-3 py-6 text-center text-sm text-emerald-700/70">No campaigns found</div>
-              <div class="flex items-center justify-between gap-2 border-t border-emerald-100 px-3 py-2">
-                <button type="button" data-ms-clear class="text-xs font-semibold text-emerald-700 hover:text-brand-green">Clear</button>
-                <button type="button" data-ms-close class="text-xs font-semibold text-brand-green hover:text-brand-greenDark">Done</button>
-              </div>
-            </div>
-          </div>
+          <label class="block text-xs font-semibold text-emerald-900/80 mb-1">Campaign ID</label>
+          <select id="f-campaignid" class="w-full rounded-xl border border-emerald-100 bg-emerald-50/40 px-3 py-2 focus:ring-2 focus:ring-brand-gold/50 outline-none">
+            <option value="">All campaigns</option>
+          </select>
         </div>
         <div>
-          <label class="block text-xs font-semibold text-emerald-900/80 mb-1">Ad Sets</label>
-          <div id="adsetFilter" class="relative" data-ms-root="adsets">
-            <button type="button" class="w-full flex items-center justify-between gap-2 rounded-xl border border-emerald-100 bg-emerald-50/40 px-3 py-2 text-sm font-medium text-emerald-900 focus:outline-none focus:ring-2 focus:ring-brand-gold/40" data-ms-trigger aria-haspopup="listbox" aria-expanded="false">
-              <span data-ms-label>All ad sets</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
-            </button>
-            <div data-ms-dropdown class="absolute left-0 right-0 top-full z-40 mt-2 hidden rounded-2xl border border-emerald-100 bg-white shadow-soft">
-              <div class="border-b border-emerald-100 px-3 py-2">
-                <input type="search" data-ms-search class="w-full rounded-lg border border-emerald-100 bg-emerald-50/40 px-3 py-2 text-sm text-emerald-900 focus:outline-none focus:ring-2 focus:ring-brand-gold/40" placeholder="Search ad sets" autocomplete="off">
-              </div>
-              <div data-ms-options class="max-h-60 overflow-y-auto p-2 space-y-1"></div>
-              <div data-ms-empty class="hidden px-3 py-6 text-center text-sm text-emerald-700/70">No ad sets found</div>
-              <div class="flex items-center justify-between gap-2 border-t border-emerald-100 px-3 py-2">
-                <button type="button" data-ms-clear class="text-xs font-semibold text-emerald-700 hover:text-brand-green">Clear</button>
-                <button type="button" data-ms-close class="text-xs font-semibold text-brand-green hover:text-brand-greenDark">Done</button>
-              </div>
-            </div>
-          </div>
+          <label class="block text-xs font-semibold text-emerald-900/80 mb-1">Ad Set ID</label>
+          <select id="f-adsetid" class="w-full rounded-xl border border-emerald-100 bg-emerald-50/40 px-3 py-2 focus:ring-2 focus:ring-brand-gold/50 outline-none">
+            <option value="">All ad sets</option>
+          </select>
         </div>
         <div class="sm:col-span-2">
           <label class="block text-xs font-semibold text-emerald-900/80 mb-1">Ordered</label>
@@ -131,7 +102,7 @@
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
             <svg data-lucide="bar-chart-3" class="w-5 h-5 text-brand-gold"></svg>
-            <h3 class="font-semibold text-emerald-900">Messages &amp; Orders by Campaign</h3>
+            <h3 class="font-semibold text-emerald-900">Records by Campaign ID</h3>
           </div>
           <span class="text-xs text-emerald-800/60">Top 15</span>
         </div>
@@ -146,7 +117,7 @@
         </div>
         <canvas id="orderedChart" height="240"></canvas>
       </div>
-      <div class="bg-white rounded-3xl shadow-soft border border-emerald-50 p-5">
+      <div class="bg-white rounded-3xl shadow-soft border border-emerald-50 p-5 lg:col-span-2">
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
             <svg data-lucide="line-chart" class="w-5 h-5 text-brand-gold"></svg>
@@ -155,16 +126,6 @@
           <span class="text-xs text-emerald-800/60">Top 15</span>
         </div>
         <canvas id="adsetChart" height="240"></canvas>
-      </div>
-      <div class="bg-white rounded-3xl shadow-soft border border-emerald-50 p-5">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            <svg data-lucide="percent" class="w-5 h-5 text-brand-gold"></svg>
-            <h3 class="font-semibold text-emerald-900">Conversion Rate by Campaign</h3>
-          </div>
-          <span class="text-xs text-emerald-800/60">Best 10 (≥5 msgs)</span>
-        </div>
-        <canvas id="campaignRatioChart" height="240"></canvas>
       </div>
     </section>
 
@@ -187,13 +148,11 @@
 
   <!-- Supabase JS v2 UMD -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
   <script>
     // ==== CONFIG ====
     const SUPABASE_URL = 'https://whmbrguzumyatnslzfsq.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndobWJyZ3V6dW15YXRuc2x6ZnNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzNTE2ODksImV4cCI6MjA2NDkyNzY4OX0.xcSogaAHv8uQzhFgEDZ1niFx8lirLiBRvkPpMF174YM';
     const TABLE = 'ads_damtonda';
-    const CAMPAIGN_LIST_URL = 'https://primary-production-9e01d.up.railway.app/webhook/88011745-0650-4fdc-9caa-628ed08eab95';
 
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: false } });
 
@@ -206,323 +165,48 @@
     const loadMoreBtn= $('#loadMoreBtn');
     const cardsWrap  = $('#cards');
     const kpisWrap   = $('#kpis');
-    const orderedSelect = $('#f-ordered');
-    const campaignFilterRoot = document.getElementById('campaignFilter');
-    const adsetFilterRoot = document.getElementById('adsetFilter');
 
-    const campaignFilter = createMultiSelect(campaignFilterRoot, {
-      placeholder: 'All campaigns',
-      onChange: () => {
-        updateAdsetOptions();
-        applyFiltersAndRender();
-      }
-    });
-
-    const adsetFilter = createMultiSelect(adsetFilterRoot, {
-      placeholder: 'All ad sets',
-      onChange: () => applyFiltersAndRender()
-    });
+    const fCampaign  = $('#f-campaignid');
+    const fAdset     = $('#f-adsetid');
+    const fOrdered   = $('#f-ordered');
 
     // Charts
-    let campaignChart, orderedChart, adsetChart, campaignRatioChart;
+    let campaignChart, orderedChart, adsetChart;
 
     // State
     let paginatedRows = [];
     let allRows = [];
     const PAGE_SIZE = 36;
     let pageIndex = 0;
-    let campaignDirectory = new Map();
-    let campaignDirectoryPromise = null;
 
     // Icons
     lucide.createIcons();
 
     // ---- helpers ----
-    function escapeHtml(value){
-      if (value === null || value === undefined) return '';
-      return String(value).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch] || ch));
-    }
+    const toNumberOrNull = (v) => {
+      const t = String(v||'').trim();
+      if (!t) return null;
+      return /^-?\\d+(?:\\.\\d+)?$/.test(t) ? Number(t) : null;
+    };
 
     const isTrue = (val) => (val === true || val === 1 || (typeof val === 'string' && ['true','t','1','yes','y'].includes(val.toLowerCase())));
 
-    function parseCampaignLine(line){
-      if (typeof line !== 'string') return null;
-      const clean = line.replace(//g,'').trim();
-      if (!clean) return null;
-      const idx = clean.indexOf(' - ');
-      if (idx === -1) return { id: clean, name: '' };
-      const id = clean.slice(0, idx).trim();
-      const name = clean.slice(idx + 3).replace(/\s+/g, ' ').trim();
-      return { id, name };
-    }
+    function buildFiltersOn(query){
+      const c = toNumberOrNull(fCampaign.value);
+      const s = toNumberOrNull(fAdset.value);
+      const o = fOrdered.value;
 
-    function normalizeCampaignPayload(payload){
-      try {
-        const root = Array.isArray(payload) ? payload[0] : payload;
-        if (!root) return [];
-        const arr = root['all campaigns'] || root['all_campaigns'] || root['campaigns'] || [];
-        if (!Array.isArray(arr)) return [];
-        const map = new Map();
-        for (const item of arr){
-          const parsed = parseCampaignLine(item);
-          if (parsed?.id && !map.has(parsed.id)){
-            map.set(parsed.id, parsed);
-          }
-        }
-        return Array.from(map.values());
-      } catch (err){
-        console.warn('Failed to normalise campaign payload', err);
-        return [];
-      }
-    }
-
-    async function fetchCampaignDirectory(){
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 60000);
-      try {
-        const res = await fetch(CAMPAIGN_LIST_URL, { mode: 'cors', credentials: 'omit', cache: 'no-store', signal: controller.signal });
-        const text = await res.text();
-        let json;
-        try { json = JSON.parse(text); } catch { json = text; }
-        const campaigns = normalizeCampaignPayload(json);
-        const map = new Map();
-        for (const item of campaigns){
-          const id = item.id?.toString();
-          if (!id) continue;
-          map.set(id, item.name || '');
-        }
-        return map;
-      } catch (err){
-        console.warn('Failed to fetch campaign directory', err);
-        return new Map();
-      } finally {
-        clearTimeout(timeout);
-      }
-    }
-
-    async function ensureCampaignDirectory(){
-      if (campaignDirectory.size) return campaignDirectory;
-      if (!campaignDirectoryPromise){
-        campaignDirectoryPromise = fetchCampaignDirectory().then(map => {
-          campaignDirectory = map;
-          return map;
-        }).catch(err => {
-          console.warn('Campaign directory load error', err);
-          return campaignDirectory;
-        }).finally(() => {
-          campaignDirectoryPromise = null;
-        });
-      }
-      try {
-        return await campaignDirectoryPromise;
-      } catch {
-        return campaignDirectory;
-      }
-    }
-
-    function getCampaignName(id){
-      if (id === null || id === undefined || id === '') return null;
-      const key = String(id);
-      return campaignDirectory.get(key) || null;
-    }
-
-    function formatCampaignLabel(id, { short=false } = {}){
-      if (id === null || id === undefined || id === '') return '—';
-      const name = getCampaignName(id);
-      const base = name ? (short ? name : `${name} (#${id})`) : `Campaign ${id}`;
-      return base;
-    }
-
-    function createMultiSelect(root, { placeholder='Select', onChange } = {}){
-      if (!root) return {
-        setOptions(){},
-        getSelectedValues(){ return []; },
-        setSelectedValues(){},
-        clear(){ return false; },
-        close(){},
-        clearSilently(){},
-      };
-
-      const trigger = root.querySelector('[data-ms-trigger]');
-      const dropdown = root.querySelector('[data-ms-dropdown]');
-      const labelEl = root.querySelector('[data-ms-label]');
-      const optionsWrap = root.querySelector('[data-ms-options]');
-      const searchInput = root.querySelector('[data-ms-search]');
-      const emptyState = root.querySelector('[data-ms-empty]');
-      const clearBtn = root.querySelector('[data-ms-clear]');
-      const closeBtn = root.querySelector('[data-ms-close]');
-
-      let options = [];
-      const selected = new Set();
-
-      function getSelectedValues(){
-        return Array.from(selected);
-      }
-
-      function updateLabel(){
-        if (!labelEl) return;
-        if (!selected.size){
-          labelEl.textContent = placeholder;
-          return;
-        }
-        const picked = options.filter(opt => selected.has(opt.value)).map(opt => opt.label);
-        labelEl.textContent = picked.length <= 2 ? picked.join(', ') : `${picked.length} selected`;
-      }
-
-      function renderOptions(){
-        if (!optionsWrap) return;
-        if (!options.length){
-          optionsWrap.innerHTML = '';
-          if (emptyState) emptyState.classList.remove('hidden');
-          return;
-        }
-        if (emptyState) emptyState.classList.add('hidden');
-        const html = options.map(opt => {
-          const checked = selected.has(opt.value) ? 'checked' : '';
-          const badgeHtml = opt.badge ? `<span class="ml-3 inline-flex items-center rounded-full bg-brand-green/10 px-2 py-0.5 text-xs font-semibold text-brand-green/80">${escapeHtml(opt.badge)}</span>` : '';
-          const descriptionHtml = opt.description ? `<div class="text-xs text-emerald-700/70">${escapeHtml(opt.description)}</div>` : '';
-          return `
-            <label class="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2 hover:bg-emerald-50" data-ms-option data-value="${escapeHtml(opt.value)}" data-search="${escapeHtml(opt.search)}">
-              <input type="checkbox" class="h-4 w-4 rounded border-emerald-200 text-brand-green focus:ring-brand-gold/50" value="${escapeHtml(opt.value)}" ${checked}>
-              <div class="flex-1">
-                <div class="text-sm font-medium text-emerald-900">${escapeHtml(opt.label)}</div>
-                ${descriptionHtml}
-              </div>
-              ${badgeHtml}
-            </label>
-          `;
-        }).join('');
-        optionsWrap.innerHTML = html;
-      }
-
-      function filterOptions(term){
-        if (!optionsWrap) return;
-        const query = term.trim().toLowerCase();
-        let visible = 0;
-        optionsWrap.querySelectorAll('[data-ms-option]').forEach(el => {
-          const haystack = (el.dataset.search || '').toLowerCase();
-          const match = !query || haystack.includes(query);
-          el.classList.toggle('hidden', !match);
-          if (match) visible += 1;
-        });
-        if (emptyState){
-          emptyState.classList.toggle('hidden', visible > 0);
-        }
-      }
-
-      function setOptions(newOptions){
-        options = (newOptions || []).map(opt => ({
-          value: String(opt.value),
-          label: opt.label || String(opt.value),
-          description: opt.description || '',
-          badge: opt.badge || '',
-          search: (opt.search || `${opt.label || opt.value} ${opt.description || ''} ${opt.badge || ''}`).toString()
-        }));
-        const allowed = new Set(options.map(opt => opt.value));
-        let removed = false;
-        Array.from(selected).forEach(value => {
-          if (!allowed.has(value)){
-            selected.delete(value);
-            removed = true;
-          }
-        });
-        renderOptions();
-        updateLabel();
-        if (searchInput) filterOptions(searchInput.value || '');
-        if (removed && typeof onChange === 'function'){
-          onChange(getSelectedValues());
-        }
-      }
-
-      function setSelectedValues(values){
-        selected.clear();
-        (values || []).forEach(value => {
-          const v = String(value);
-          if (options.some(opt => opt.value === v)) selected.add(v);
-        });
-        renderOptions();
-        updateLabel();
-        if (searchInput) filterOptions(searchInput.value || '');
-      }
-
-      function clear({ silent=false } = {}){
-        if (!selected.size) return false;
-        selected.clear();
-        renderOptions();
-        updateLabel();
-        if (searchInput) filterOptions(searchInput.value || '');
-        if (!silent && typeof onChange === 'function'){
-          onChange(getSelectedValues());
-        }
-        return true;
-      }
-
-      function closeDropdown(){
-        if (dropdown) dropdown.classList.add('hidden');
-        if (trigger) trigger.setAttribute('aria-expanded', 'false');
-      }
-
-      function openDropdown(){
-        if (dropdown) dropdown.classList.remove('hidden');
-        if (trigger) trigger.setAttribute('aria-expanded', 'true');
-        if (searchInput){
-          searchInput.value = '';
-          filterOptions('');
-          setTimeout(() => searchInput.focus(), 0);
-        }
-      }
-
-      trigger?.addEventListener('click', (event) => {
-        event.preventDefault();
-        if (dropdown?.classList.contains('hidden')) openDropdown(); else closeDropdown();
-      });
-
-      closeBtn?.addEventListener('click', () => closeDropdown());
-
-      clearBtn?.addEventListener('click', () => {
-        const changed = clear();
-        if (!changed) closeDropdown();
-      });
-
-      optionsWrap?.addEventListener('change', (event) => {
-        const input = event.target;
-        if (!(input instanceof HTMLInputElement) || input.type !== 'checkbox') return;
-        const value = input.value;
-        if (input.checked) selected.add(value); else selected.delete(value);
-        updateLabel();
-        if (typeof onChange === 'function') onChange(getSelectedValues());
-      });
-
-      searchInput?.addEventListener('input', (event) => {
-        filterOptions(event.target.value || '');
-      });
-
-      document.addEventListener('click', (event) => {
-        if (!root.contains(event.target)) closeDropdown();
-      });
-
-      root.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape'){
-          closeDropdown();
-          trigger?.focus();
-        }
-      });
-
-      updateLabel();
-
-      return {
-        setOptions,
-        getSelectedValues,
-        setSelectedValues,
-        clear,
-        clearSilently: () => clear({ silent: true }),
-        close: closeDropdown
-      };
+      if (c !== null) query = query.eq('campaignid', c);
+      if (s !== null) query = query.eq('adsetid', s);
+      if (o === 'true') query = query.eq('ordered', true);
+      return query;
     }
 
     async function trySupabaseChunk(from, to){
       try {
-        const { data, error } = await supabase.from(TABLE).select('*').order('id', { ascending: false }).range(from, to);
+        let q = supabase.from(TABLE).select('*').order('id', { ascending: false }).range(from, to);
+        q = buildFiltersOn(q);
+        const { data, error } = await q;
         if (error) throw error;
         return data;
       } catch (e){
@@ -533,7 +217,14 @@
 
     async function tryRestChunk(from, to){
       const params = new URLSearchParams({ select: '*', order: 'id.desc' });
-      const url = `${SUPABASE_URL}/rest/v1/${TABLE}?${params.toString()}`;
+      const c = toNumberOrNull(fCampaign.value);
+      const s = toNumberOrNull(fAdset.value);
+      const o = fOrdered.value;
+      if (c !== null) params.set('campaignid', `eq.${c}`);
+      if (s !== null) params.set('adsetid', `eq.${s}`);
+      if (o === 'true') params.set('ordered', 'is.true');
+
+      const url = `${SUPABASE_URL}/rest/v1/${TABLE}?` + params.toString();
       const res = await fetch(url, {
         headers: {
           apikey: SUPABASE_ANON_KEY,
@@ -563,76 +254,6 @@
       return out;
     }
 
-    function buildKeyStats(rows, key){
-      const stats = new Map();
-      for (const row of rows){
-        const value = row[key];
-        if (value === null || value === undefined || value === '') continue;
-        const idStr = String(value);
-        let entry = stats.get(idStr);
-        if (!entry){
-          entry = { id: value, idStr, messages: 0, orders: 0 };
-          stats.set(idStr, entry);
-        }
-        entry.messages += 1;
-        if (isTrue(row.ordered)) entry.orders += 1;
-      }
-      return stats;
-    }
-
-    const buildCampaignStats = (rows) => buildKeyStats(rows, 'campaignid');
-    const buildAdsetStats = (rows) => buildKeyStats(rows, 'adsetid');
-
-    function createCampaignOptions(rows){
-      const stats = buildCampaignStats(rows);
-      return Array.from(stats.values())
-        .sort((a,b) => b.messages - a.messages)
-        .map(entry => {
-          const name = getCampaignName(entry.id);
-          const label = name || `Campaign ${entry.idStr}`;
-          const descriptionParts = [`ID ${entry.idStr}`, `${entry.messages.toLocaleString()} msgs`];
-          const badge = entry.orders ? `${entry.orders.toLocaleString()} orders` : (entry.messages ? `${((entry.orders/entry.messages)*100).toFixed(1)}% conv` : '');
-          return {
-            value: entry.idStr,
-            label,
-            description: descriptionParts.join(' • '),
-            badge,
-            search: `${label} ${descriptionParts.join(' ')} ${badge}`.trim()
-          };
-        });
-    }
-
-    function createAdsetOptions(rows){
-      const stats = buildAdsetStats(rows);
-      return Array.from(stats.values())
-        .sort((a,b) => b.messages - a.messages)
-        .map(entry => {
-          const label = `Ad Set ${entry.idStr}`;
-          const description = `${entry.messages.toLocaleString()} msgs`;
-          const badge = entry.orders ? `${entry.orders.toLocaleString()} orders` : '';
-          return {
-            value: entry.idStr,
-            label,
-            description,
-            badge,
-            search: `${label} ${description} ${badge}`.trim()
-          };
-        });
-    }
-
-    function populateCampaignOptions(rows){
-      campaignFilter.setOptions(createCampaignOptions(rows));
-    }
-
-    function updateAdsetOptions(){
-      const selectedCampaigns = new Set(campaignFilter.getSelectedValues());
-      const baseRows = selectedCampaigns.size ? allRows.filter(row => {
-        const campaignId = row.campaignid !== null && row.campaignid !== undefined ? String(row.campaignid) : null;
-        return campaignId && selectedCampaigns.has(campaignId);
-      }) : allRows;
-      adsetFilter.setOptions(createAdsetOptions(baseRows));
-    }
-
     function kpiCard({label, value, sub}) {
       return `
         <div class="bg-white border border-emerald-100 rounded-2xl p-4 shadow-soft">
@@ -645,145 +266,71 @@
 
     function renderKPIs(rows){
       const total = rows.length;
-      const campaignStats = buildCampaignStats(rows);
-      const statsArray = Array.from(campaignStats.values());
-      const orderedCount = rows.filter(r => isTrue(r.ordered)).length;
-      const orderedPct = total ? Math.round((orderedCount/total)*100) : 0;
-      const topMessages = statsArray.length ? statsArray.reduce((best, current) => current.messages > best.messages ? current : best, statsArray[0]) : null;
-      const topOrders = statsArray.length ? statsArray.reduce((best, current) => current.orders > best.orders ? current : best, statsArray[0]) : null;
-      const uniqCampaigns = campaignStats.size;
-      const avgPerCampaign = uniqCampaigns ? (total / uniqCampaigns).toFixed(1) : '0';
-      const messagesPerOrder = orderedCount ? (total / orderedCount).toFixed(1) : null;
+      const uniq = (arr, key) => new Set(arr.map(r => r[key]).filter(v => v !== null && v !== undefined && v !== '')).size;
+      const uniqCampaigns = uniq(rows, 'campaignid');
+      const uniqAdsets    = uniq(rows, 'adsetid');
+      const orderedCount  = rows.filter(r => isTrue(r.ordered)).length;
+      const orderedPct    = total ? Math.round((orderedCount/total)*100) : 0;
 
       kpisWrap.innerHTML = [
-        kpiCard({
-          label: 'Total Messages',
-          value: total.toLocaleString(),
-          sub: topMessages ? `Top: ${escapeHtml(formatCampaignLabel(topMessages.id, { short: true }))} • ${topMessages.messages.toLocaleString()} msgs` : 'Top: —'
-        }),
-        kpiCard({
-          label: 'Total Orders',
-          value: orderedCount.toLocaleString(),
-          sub: (topOrders && topOrders.orders > 0) ? `Top: ${escapeHtml(formatCampaignLabel(topOrders.id, { short: true }))} • ${topOrders.orders.toLocaleString()} orders` : 'Top: —'
-        }),
-        kpiCard({
-          label: 'Unique Campaigns',
-          value: uniqCampaigns.toLocaleString(),
-          sub: uniqCampaigns ? `Avg ${avgPerCampaign} msgs / campaign` : 'No campaigns yet'
-        }),
-        kpiCard({
-          label: 'Conversion Rate',
-          value: `${orderedPct}%`,
-          sub: messagesPerOrder ? `1 order per ${messagesPerOrder} msgs` : 'No orders yet'
-        })
+        kpiCard({ label: 'Total Records', value: total.toLocaleString() }),
+        kpiCard({ label: 'Unique Campaigns', value: uniqCampaigns.toLocaleString() }),
+        kpiCard({ label: 'Unique Ad Sets', value: uniqAdsets.toLocaleString() }),
+        kpiCard({ label: 'Ordered Ratio', value: `${orderedPct}%`, sub: `${orderedCount.toLocaleString()} TRUE` })
       ].join('');
     }
 
+    function topCounts(rows, key, topN=15){
+      const m = new Map();
+      for (const r of rows){
+        const k = r[key];
+        if (k !== null && k !== undefined && k !== '') m.set(k, (m.get(k)||0)+1);
+      }
+      const arr = Array.from(m.entries()).sort((a,b)=>b[1]-a[1]).slice(0, topN);
+      return { labels: arr.map(x=>String(x[0])), counts: arr.map(x=>x[1]) };
+    }
+
     function ensureChart(ctx, type, data, options){
-      if (!ctx) return null;
       if (ctx.__chart){ ctx.__chart.destroy(); }
       ctx.__chart = new Chart(ctx, { type, data, options });
       return ctx.__chart;
     }
 
     function renderCharts(rows){
-      const campaignStats = Array.from(buildCampaignStats(rows).values()).sort((a,b) => b.messages - a.messages).slice(0, 15);
-      const campaignLabels = campaignStats.map(entry => formatCampaignLabel(entry.id));
-      const campaignMessages = campaignStats.map(entry => entry.messages);
-      const campaignOrders = campaignStats.map(entry => entry.orders);
-
+      const cc = topCounts(rows, 'campaignid', 15);
       const cctx = document.getElementById('campaignChart');
-      ensureChart(cctx, 'bar', {
-        labels: campaignLabels,
-        datasets: [
-          { label: 'Messages', data: campaignMessages, backgroundColor: '#16a34a', borderRadius: 8, maxBarThickness: 36 },
-          { label: 'Orders', data: campaignOrders, backgroundColor: '#C6A044', borderRadius: 8, maxBarThickness: 36 }
-        ]
-      }, {
-        responsive: true,
-        plugins: { legend: { position: 'top' } },
-        scales: { x: { ticks: { maxRotation: 0, autoSkip: true } }, y: { beginAtZero: true } }
-      });
+      ensureChart(cctx, 'bar', { labels: cc.labels, datasets: [{ label: 'Records', data: cc.counts }] }, { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { maxRotation: 0, autoSkip: true } }, y: { beginAtZero: true } } });
 
       const ordered = rows.filter(r => isTrue(r.ordered)).length;
       const notOrdered = rows.length - ordered;
       const octx = document.getElementById('orderedChart');
-      ensureChart(octx, 'pie', {
-        labels: ['Orders', 'No order'],
-        datasets: [{ data: [ordered, Math.max(notOrdered, 0)], backgroundColor: ['#C6A044', '#d1fae5'] }]
-      }, { responsive: true });
+      ensureChart(octx, 'pie', { labels: ['Ordered (TRUE)', 'NULL'], datasets: [{ data: [ordered, notOrdered] }] }, { responsive: true });
 
-      const adsetStats = Array.from(buildAdsetStats(rows).values()).sort((a,b) => b.messages - a.messages).slice(0, 15);
-      const adsetLabels = adsetStats.map(entry => `Ad Set ${entry.idStr}`);
-      const adsetMessages = adsetStats.map(entry => entry.messages);
+      const ac = topCounts(rows, 'adsetid', 15);
       const actx = document.getElementById('adsetChart');
-      ensureChart(actx, 'bar', {
-        labels: adsetLabels,
-        datasets: [{ label: 'Messages', data: adsetMessages, backgroundColor: '#16a34a', borderRadius: 8, maxBarThickness: 36 }]
-      }, {
-        responsive: true,
-        plugins: { legend: { display: false } },
-        scales: { x: { ticks: { maxRotation: 0, autoSkip: true } }, y: { beginAtZero: true } }
-      });
-
-      const ratioCandidates = campaignStats.filter(entry => entry.messages >= 5).sort((a,b) => (b.orders / (b.messages || 1)) - (a.orders / (a.messages || 1))).slice(0, 10);
-      const ratioLabels = ratioCandidates.map(entry => formatCampaignLabel(entry.id));
-      const ratioData = ratioCandidates.map(entry => Number(((entry.orders / entry.messages) * 100).toFixed(1)));
-      const rctx = document.getElementById('campaignRatioChart');
-      ensureChart(rctx, 'bar', {
-        labels: ratioLabels,
-        datasets: [{ label: 'Conversion %', data: ratioData, backgroundColor: '#0f7a37', borderRadius: 8, maxBarThickness: 36 }]
-      }, {
-        responsive: true,
-        indexAxis: 'y',
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: (context) => {
-                const item = ratioCandidates[context.dataIndex];
-                if (!item) return `${context.parsed.x ?? 0}%`;
-                const rate = typeof context.parsed.x === 'number' ? context.parsed.x.toFixed(1) : context.parsed.x;
-                return `${rate}% • ${item.orders.toLocaleString()} orders / ${item.messages.toLocaleString()} msgs`;
-              }
-            }
-          }
-        },
-        scales: {
-          x: {
-            beginAtZero: true,
-            ticks: {
-              callback: (value) => `${value}%`
-            }
-          }
-        }
-      });
+      ensureChart(actx, 'bar', { labels: ac.labels, datasets: [{ label: 'Records', data: ac.counts }] }, { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { maxRotation: 0, autoSkip: true } }, y: { beginAtZero: true } } });
     }
 
     function recordCard(r){
-      const badge = (label) => `<span class="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-900">${escapeHtml(label)}</span>`;
+      const badge = (label) => `<span class="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-900">${label}</span>`;
       const hasOrdered = isTrue(r.ordered);
-      const adTitle = r.adid != null ? `Ad ${r.adid}` : 'Ad —';
-      const campaignLabel = `Campaign: ${formatCampaignLabel(r.campaignid)}`;
-      const adsetLabel = `Ad Set: ${r.adsetid ?? '—'}`;
-      const psidLabel = r.psid != null ? `PSID: ${r.psid}` : null;
       return `
         <div class="rounded-2xl border border-emerald-100 bg-white p-4 shadow-soft">
           <div class="flex items-start justify-between">
             <div>
-              <div class="text-[11px] uppercase tracking-wide text-emerald-800/60">ID #${escapeHtml(r.id)}</div>
-              <div class="mt-1 text-lg font-semibold text-emerald-900">${escapeHtml(adTitle)}</div>
+              <div class="text-[11px] uppercase tracking-wide text-emerald-800/60">ID #${r.id}</div>
+              <div class="mt-1 text-lg font-semibold text-emerald-900">Ad ${r.adid ?? '—'}</div>
             </div>
-            <div class="h-9 w-9 rounded-xl flex items-center justify-center ${hasOrdered ? 'bg-brand-gold' : 'bg-emerald-100'}" title="${hasOrdered ? 'Converted' : 'No conversion'}">
+            <div class="h-9 w-9 rounded-xl flex items-center justify-center ${hasOrdered ? 'bg-brand-gold' : 'bg-emerald-100'}" title="Ordered">
               <svg data-lucide="${hasOrdered ? 'check' : 'circle'}" class="w-5 h-5 ${hasOrdered ? 'text-white' : 'text-emerald-700'}"></svg>
             </div>
           </div>
           <div class="mt-3 flex flex-wrap gap-2">
-            ${badge(campaignLabel)}
-            ${badge(adsetLabel)}
-            ${psidLabel ? badge(psidLabel) : ''}
+            ${badge('Campaign: ' + (r.campaignid ?? '—'))}
+            ${badge('Ad Set: ' + (r.adsetid ?? '—'))}
+            ${r.psid != null ? badge('PSID: ' + r.psid) : ''}
           </div>
-          <div class="mt-3 text-sm text-emerald-800/80">${hasOrdered ? 'This message generated an order.' : 'Awaiting conversion from this message.'}</div>
+          ${hasOrdered ? `<div class="mt-3 text-sm text-emerald-900"><span class="font-semibold">Ordered:</span> TRUE</div>` : ''}
         </div>
       `;
     }
@@ -793,90 +340,59 @@
       const end   = start + PAGE_SIZE;
       const slice = rows.slice(start, end);
       const html = slice.map(recordCard).join('');
-      if (pageIndex === 0){
-        if (slice.length){
-          cardsWrap.innerHTML = html;
-        } else {
-          cardsWrap.innerHTML = '<div class="md:col-span-2 xl:col-span-3 rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/40 p-6 text-center text-sm text-emerald-700/70">No records match the current filters.</div>';
-        }
-      } else if (slice.length){
-        cardsWrap.insertAdjacentHTML('beforeend', html);
-      }
+      if (pageIndex === 0) cardsWrap.innerHTML = html; else cardsWrap.insertAdjacentHTML('beforeend', html);
       loadMoreBtn.classList.toggle('hidden', end >= rows.length);
       lucide.createIcons();
     }
 
-    function applyFilters(rows){
-      const selectedCampaigns = new Set(campaignFilter.getSelectedValues());
-      const selectedAdsets = new Set(adsetFilter.getSelectedValues());
-      const orderedFilter = orderedSelect?.value || '';
-      return rows.filter(row => {
-        const campaignId = row.campaignid !== null && row.campaignid !== undefined ? String(row.campaignid) : null;
-        if (selectedCampaigns.size && (!campaignId || !selectedCampaigns.has(campaignId))) return false;
-        const adsetId = row.adsetid !== null && row.adsetid !== undefined ? String(row.adsetid) : null;
-        if (selectedAdsets.size && (!adsetId || !selectedAdsets.has(adsetId))) return false;
-        if (orderedFilter === 'true' && !isTrue(row.ordered)) return false;
-        return true;
-      });
+    function populateDropdowns(rows){
+      const campaigns = Array.from(new Set(rows.map(r => r.campaignid).filter(v => v !== null && v !== undefined && v !== ''))).sort((a,b)=>a-b);
+      const selectedC = fCampaign.value;
+      fCampaign.innerHTML = '<option value=\"\">All campaigns</option>' + campaigns.map(v => `<option value=\"${v}\">${v}</option>`).join('');
+      if (selectedC && campaigns.includes(Number(selectedC))) fCampaign.value = selectedC;
+
+      const pool = selectedC ? rows.filter(r => r.campaignid === Number(selectedC)) : rows;
+      const adsets = Array.from(new Set(pool.map(r => r.adsetid).filter(v => v !== null && v !== undefined && v !== ''))).sort((a,b)=>a-b);
+      const selectedS = fAdset.value;
+      fAdset.innerHTML = '<option value=\"\">All ad sets</option>' + adsets.map(v => `<option value=\"${v}\">${v}</option>`).join('');
+      if (selectedS && adsets.includes(Number(selectedS))) fAdset.value = selectedS;
+      else fAdset.value = '';
     }
 
-    function applyFiltersAndRender(){
-      const filtered = applyFilters(allRows);
-      paginatedRows = filtered;
-      pageIndex = 0;
-      renderKPIs(filtered);
-      renderCharts(filtered);
-      renderCards(filtered);
-    }
-
-    async function refreshData(){
+    async function run(){
       try {
         document.body.style.cursor = 'progress';
-        await ensureCampaignDirectory();
         const rows = await fetchAll(5000);
         allRows = rows;
 
-        const previousCampaigns = campaignFilter.getSelectedValues();
-        const previousAdsets = adsetFilter.getSelectedValues();
+        // Populate dropdowns from data (and re-populate on every run to reflect current filters)
+        populateDropdowns(allRows);
 
-        populateCampaignOptions(allRows);
-        campaignFilter.setSelectedValues(previousCampaigns);
-        updateAdsetOptions();
-        adsetFilter.setSelectedValues(previousAdsets);
+        // Server-side filtered result already returned (buildFiltersOn added to queries)
+        const filtered = rows;
 
-        applyFiltersAndRender();
+        renderKPIs(filtered);
+        renderCharts(filtered);
+        paginatedRows = filtered;
+        pageIndex = 0;
+        renderCards(paginatedRows);
       } catch (err){
         console.error(err);
-        alert('Failed to fetch data. Check Supabase RLS and credentials.
-' + (err.message || err));
+        alert('Failed to fetch data. Check Supabase RLS and credentials.\\n' + (err.message || err));
       } finally {
         document.body.style.cursor = 'default';
       }
     }
 
     // Events
-    refreshBtn?.addEventListener('click', () => refreshData());
-    applyBtn?.addEventListener('click', () => applyFiltersAndRender());
-    clearBtn?.addEventListener('click', () => {
-      if (orderedSelect) orderedSelect.value = '';
-      const campaignChanged = campaignFilter.clear();
-      const adsetChanged = adsetFilter.clear();
-      if (!campaignChanged){
-        updateAdsetOptions();
-      }
-      if (!campaignChanged && !adsetChanged){
-        applyFiltersAndRender();
-      }
-    });
-    orderedSelect?.addEventListener('change', () => applyFiltersAndRender());
-    loadMoreBtn?.addEventListener('click', () => {
-      pageIndex += 1;
-      renderCards(paginatedRows);
-    });
+    refreshBtn.addEventListener('click', () => run());
+    applyBtn.addEventListener('click', () => run());
+    clearBtn.addEventListener('click', () => { [fCampaign,fAdset,fOrdered].forEach(i=> i.value=''); populateDropdowns(allRows); run(); });
+    fCampaign.addEventListener('change', () => { populateDropdowns(allRows); }); // cascade adsets
+    [fCampaign,fAdset,fOrdered].forEach(sel => sel.addEventListener('change', () => run()));
 
     // Boot
-    refreshData();
+    run();
   </script>
-
 </body>
 </html>
