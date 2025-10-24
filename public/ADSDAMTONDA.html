@@ -69,15 +69,13 @@
       <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
           <label class="block text-xs font-semibold text-emerald-900/80 mb-1">Campaign ID</label>
-          <select id="f-campaignid" class="w-full rounded-xl border border-emerald-100 bg-emerald-50/40 px-3 py-2 focus:ring-2 focus:ring-brand-gold/50 outline-none">
-            <option value="">All campaigns</option>
-          </select>
+          <select multiple size="6" id="f-campaignid" class="w-full rounded-xl border border-emerald-100 bg-emerald-50/40 px-3 py-2 focus:ring-2 focus:ring-brand-gold/50 outline-none"></select>
+          <p class="mt-1 text-[11px] text-emerald-700/70">Use Ctrl/⌘ or Shift to compare multiple campaigns.</p>
         </div>
         <div>
           <label class="block text-xs font-semibold text-emerald-900/80 mb-1">Ad Set ID</label>
-          <select id="f-adsetid" class="w-full rounded-xl border border-emerald-100 bg-emerald-50/40 px-3 py-2 focus:ring-2 focus:ring-brand-gold/50 outline-none">
-            <option value="">All ad sets</option>
-          </select>
+          <select multiple size="6" id="f-adsetid" class="w-full rounded-xl border border-emerald-100 bg-emerald-50/40 px-3 py-2 focus:ring-2 focus:ring-brand-gold/50 outline-none"></select>
+          <p class="mt-1 text-[11px] text-emerald-700/70">Ad sets are scoped to the selected campaigns.</p>
         </div>
         <div class="sm:col-span-2">
           <label class="block text-xs font-semibold text-emerald-900/80 mb-1">Ordered</label>
@@ -102,7 +100,7 @@
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
             <svg data-lucide="bar-chart-3" class="w-5 h-5 text-brand-gold"></svg>
-            <h3 class="font-semibold text-emerald-900">Records by Campaign ID</h3>
+            <h3 class="font-semibold text-emerald-900">Records by Campaign</h3>
           </div>
           <span class="text-xs text-emerald-800/60">Top 15</span>
         </div>
@@ -117,7 +115,7 @@
         </div>
         <canvas id="orderedChart" height="240"></canvas>
       </div>
-      <div class="bg-white rounded-3xl shadow-soft border border-emerald-50 p-5 lg:col-span-2">
+      <div class="bg-white rounded-3xl shadow-soft border border-emerald-50 p-5">
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
             <svg data-lucide="line-chart" class="w-5 h-5 text-brand-gold"></svg>
@@ -126,6 +124,21 @@
           <span class="text-xs text-emerald-800/60">Top 15</span>
         </div>
         <canvas id="adsetChart" height="240"></canvas>
+      </div>
+      <div class="bg-white rounded-3xl shadow-soft border border-emerald-50 p-5">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <svg data-lucide="percent" class="w-5 h-5 text-brand-gold"></svg>
+            <h3 class="font-semibold text-emerald-900">Orders per Message</h3>
+          </div>
+          <span class="text-xs text-emerald-800/60">Top 10 by messages</span>
+        </div>
+        <div class="relative">
+          <canvas id="ratioChart" height="240"></canvas>
+          <div id="ratioEmpty" class="absolute inset-0 flex items-center justify-center text-sm text-emerald-800/70 hidden">
+            No message data available for the current selection.
+          </div>
+        </div>
       </div>
     </section>
 
@@ -171,13 +184,17 @@
     const fOrdered   = $('#f-ordered');
 
     // Charts
-    let campaignChart, orderedChart, adsetChart;
+    let campaignChart, orderedChart, adsetChart, ratioChart;
 
     // State
     let paginatedRows = [];
-    let allRows = [];
+    let masterRows = [];
+    let filteredRows = [];
     const PAGE_SIZE = 36;
     let pageIndex = 0;
+    let messageFieldName = null;
+    const campaignDirectory = new Map();
+    let directoryLoaded = false;
 
     // Icons
     lucide.createIcons();
@@ -191,21 +208,48 @@
 
     const isTrue = (val) => (val === true || val === 1 || (typeof val === 'string' && ['true','t','1','yes','y'].includes(val.toLowerCase())));
 
-    function buildFiltersOn(query){
-      const c = toNumberOrNull(fCampaign.value);
-      const s = toNumberOrNull(fAdset.value);
-      const o = fOrdered.value;
+    function getSelectedNumbers(select){
+      return Array.from(select?.selectedOptions || [])
+        .map(opt => toNumberOrNull(opt.value))
+        .filter(v => v !== null);
+    }
 
-      if (c !== null) query = query.eq('campaignid', c);
-      if (s !== null) query = query.eq('adsetid', s);
-      if (o === 'true') query = query.eq('ordered', true);
+    function setSelectedValues(select, values){
+      const set = new Set(values.map(v => String(v)));
+      Array.from(select?.options || []).forEach(opt => {
+        opt.selected = set.has(opt.value);
+      });
+      if (!set.size) select.selectedIndex = -1;
+    }
+
+    function clearMulti(select){
+      Array.from(select?.options || []).forEach(opt => { opt.selected = false; });
+      select.selectedIndex = -1;
+    }
+
+    function currentFilters(){
+      const campaigns = getSelectedNumbers(fCampaign);
+      const adsets = getSelectedNumbers(fAdset);
+      const orderedVal = fOrdered.value === 'true' ? true : null;
+      return { campaigns, adsets, orderedVal };
+    }
+
+    function buildFiltersOn(query, filters){
+      const { campaigns, adsets, orderedVal } = filters;
+      if (campaigns.length === 1) query = query.eq('campaignid', campaigns[0]);
+      else if (campaigns.length > 1) query = query.in('campaignid', campaigns);
+
+      if (adsets.length === 1) query = query.eq('adsetid', adsets[0]);
+      else if (adsets.length > 1) query = query.in('adsetid', adsets);
+
+      if (orderedVal === true) query = query.eq('ordered', true);
       return query;
     }
 
-    async function trySupabaseChunk(from, to){
+    async function trySupabaseChunk(from, to, filters){
       try {
         let q = supabase.from(TABLE).select('*').order('id', { ascending: false }).range(from, to);
-        q = buildFiltersOn(q);
+        q = buildFiltersOn(q, filters);
         const { data, error } = await q;
         if (error) throw error;
         return data;
@@ -215,14 +259,16 @@
       }
     }
 
-    async function tryRestChunk(from, to){
+    async function tryRestChunk(from, to, filters){
       const params = new URLSearchParams({ select: '*', order: 'id.desc' });
-      const c = toNumberOrNull(fCampaign.value);
-      const s = toNumberOrNull(fAdset.value);
-      const o = fOrdered.value;
-      if (c !== null) params.set('campaignid', `eq.${c}`);
-      if (s !== null) params.set('adsetid', `eq.${s}`);
-      if (o === 'true') params.set('ordered', 'is.true');
+      const { campaigns, adsets, orderedVal } = filters;
+      if (campaigns.length === 1) params.set('campaignid', `eq.${campaigns[0]}`);
+      else if (campaigns.length > 1) params.set('campaignid', `in.(${campaigns.join(',')})`);
+
+      if (adsets.length === 1) params.set('adsetid', `eq.${adsets[0]}`);
+      else if (adsets.length > 1) params.set('adsetid', `in.(${adsets.join(',')})`);
+
+      if (orderedVal === true) params.set('ordered', 'is.true');
 
       const url = `${SUPABASE_URL}/rest/v1/${TABLE}?` + params.toString();
       const res = await fetch(url, {
@@ -237,21 +283,151 @@
       return await res.json();
     }
 
-    async function fetchAll(limit=5000){
+    async function fetchAll(limit=5000, { applyFilters = true } = {}){
+      const filters = applyFilters ? currentFilters() : { campaigns: [], adsets: [], orderedVal: null };
       const batch = 1000;
       let from = 0, to = Math.min(batch-1, limit-1);
       const out = [];
       let usedRest = false;
 
       while (from < limit){
-        let chunk = await trySupabaseChunk(from, to);
-        if (chunk === null){ usedRest = true; chunk = await tryRestChunk(from, to); }
+        let chunk = await trySupabaseChunk(from, to, filters);
+        if (chunk === null){ usedRest = true; chunk = await tryRestChunk(from, to, filters); }
         out.push(...chunk);
         if (chunk.length < (to-from+1)) break;
         from += batch; to = Math.min(to + batch, limit-1);
       }
       if (usedRest) console.info('Using REST fallback');
       return out;
+    }
+
+    const MESSAGE_FIELD_CANDIDATES = [
+      'messages_started','message_started','messagestarted','messagesstarted','messages','messagecount','message_count','messages_count','messageinitiated','messagesinitiated','messages_total','messagesent'
+    ];
+
+    function detectMessageField(rows){
+      if (!rows || !rows.length) return null;
+      const candidates = new Map();
+      for (const row of rows){
+        if (!row || typeof row !== 'object') continue;
+        for (const key of Object.keys(row)){
+          if (!key) continue;
+          const lower = key.toLowerCase();
+          if (!candidates.has(lower)) candidates.set(lower, key);
+        }
+      }
+      for (const cand of MESSAGE_FIELD_CANDIDATES){
+        if (candidates.has(cand)) return candidates.get(cand);
+      }
+      for (const [lower, original] of candidates.entries()){
+        if (lower.includes('message')) return original;
+      }
+      return null;
+    }
+
+    function parseMessageValue(val){
+      if (val === null || val === undefined) return 0;
+      if (typeof val === 'number' && Number.isFinite(val)) return val;
+      if (typeof val === 'boolean') return val ? 1 : 0;
+      if (typeof val === 'string'){
+        const trimmed = val.trim();
+        if (!trimmed) return 0;
+        const lower = trimmed.toLowerCase();
+        if (['true','t','1','yes','y'].includes(lower)) return 1;
+        const numeric = Number(trimmed.replace(/,/g,''));
+        return Number.isFinite(numeric) ? numeric : 0;
+      }
+      return 0;
+    }
+
+    function aggregateByCampaign(rows){
+      const summary = new Map();
+      for (const r of rows){
+        const id = r.campaignid;
+        if (id === null || id === undefined || id === '') continue;
+        if (!summary.has(id)) summary.set(id, { campaignid: id, orders: 0, messages: 0 });
+        const item = summary.get(id);
+        if (isTrue(r.ordered)) item.orders += 1;
+        if (messageFieldName){
+          item.messages += parseMessageValue(r[messageFieldName]);
+        }
+      }
+      return Array.from(summary.values());
+    }
+
+    const LIST_URL = 'https://primary-production-9e01d.up.railway.app/webhook/88011745-0650-4fdc-9caa-628ed08eab95';
+
+    async function fetchJson(url, options={}){
+      const controller = new AbortController();
+      const t = setTimeout(()=>controller.abort(), 120000);
+      try {
+        const res = await fetch(url, { mode: 'cors', cache: 'no-store', signal: controller.signal, ...options });
+        const text = await res.text();
+        let data;
+        try { data = JSON.parse(text); } catch { data = text; }
+        return { ok: res.ok, status: res.status, data, raw: text };
+      } catch (err){
+        return { ok: false, status: 0, data: null, raw: err?.message || String(err) };
+      } finally {
+        clearTimeout(t);
+      }
+    }
+
+    function parseCampaignLine(line){
+      if (typeof line !== 'string') return null;
+      const clean = line.replace(/\r/g,'').trim();
+      if (!clean) return null;
+      const idx = clean.indexOf(' - ');
+      if (idx === -1) {
+        const idOnly = clean.trim();
+        return { id: idOnly, name: '' };
+      }
+      const id = clean.slice(0, idx).trim();
+      const name = clean.slice(idx + 3).replace(/\s+/g,' ').trim();
+      return { id, name };
+    }
+
+    function normalizeCampaignDirectory(payload){
+      if (!payload) return [];
+      const root = Array.isArray(payload) ? payload[0] : payload;
+      if (!root || typeof root !== 'object') return [];
+      const arr = root['all campaigns'] || root['all_campaigns'] || root['campaigns'] || [];
+      if (!Array.isArray(arr)) return [];
+      const unique = new Map();
+      for (const item of arr){
+        const parsed = parseCampaignLine(item);
+        if (parsed && parsed.id) unique.set(parsed.id, parsed);
+      }
+      return Array.from(unique.values());
+    }
+
+    async function loadCampaignDirectory(force=false){
+      if (directoryLoaded && !force) return;
+      try {
+        const res = await fetchJson(LIST_URL, { method: 'GET' });
+        if (!res.ok) throw new Error(`Directory request failed (${res.status})`);
+        let payload = res.data;
+        if (typeof payload === 'string'){
+          try { payload = JSON.parse(payload); } catch {}
+        }
+        const entries = normalizeCampaignDirectory(payload);
+        campaignDirectory.clear();
+        for (const entry of entries){
+          const id = String(entry.id || '').trim();
+          if (!id) continue;
+          campaignDirectory.set(id, entry.name || '');
+        }
+        directoryLoaded = true;
+      } catch (err){
+        console.warn('Campaign directory fetch failed', err);
+      }
+    }
+
+    function formatCampaignLabel(id){
+      if (id === null || id === undefined || id === '') return '—';
+      const strId = String(id);
+      const name = campaignDirectory.get(strId);
+      return name ? `${name} (${strId})` : strId;
     }
 
     function kpiCard({label, value, sub}) {
@@ -272,12 +448,31 @@
       const orderedCount  = rows.filter(r => isTrue(r.ordered)).length;
       const orderedPct    = total ? Math.round((orderedCount/total)*100) : 0;
 
-      kpisWrap.innerHTML = [
+      const cards = [
         kpiCard({ label: 'Total Records', value: total.toLocaleString() }),
         kpiCard({ label: 'Unique Campaigns', value: uniqCampaigns.toLocaleString() }),
         kpiCard({ label: 'Unique Ad Sets', value: uniqAdsets.toLocaleString() }),
         kpiCard({ label: 'Ordered Ratio', value: `${orderedPct}%`, sub: `${orderedCount.toLocaleString()} TRUE` })
-      ].join('');
+      ];
+
+      if (messageFieldName){
+        const metrics = aggregateByCampaign(rows);
+        const totalMessages = metrics.reduce((acc, m) => acc + m.messages, 0);
+        const totalOrders = metrics.reduce((acc, m) => acc + m.orders, 0);
+        const ratio = totalMessages ? (totalOrders / totalMessages) : 0;
+        const topMessage = metrics.filter(m => m.messages > 0).sort((a,b)=>b.messages - a.messages)[0];
+        cards.push(
+          kpiCard({ label: 'Total Messages', value: totalMessages.toLocaleString() }),
+          kpiCard({ label: 'Orders per Message', value: ratio ? ratio.toFixed(2) : '0.00' })
+        );
+        if (topMessage){
+          cards.push(
+            kpiCard({ label: 'Most Messages', value: formatCampaignLabel(topMessage.campaignid), sub: `${Math.round(topMessage.messages).toLocaleString()} messages` })
+          );
+        }
+      }
+
+      kpisWrap.innerHTML = cards.join('');
     }
 
     function topCounts(rows, key, topN=15){
@@ -299,7 +494,18 @@
     function renderCharts(rows){
       const cc = topCounts(rows, 'campaignid', 15);
       const cctx = document.getElementById('campaignChart');
-      ensureChart(cctx, 'bar', { labels: cc.labels, datasets: [{ label: 'Records', data: cc.counts }] }, { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { maxRotation: 0, autoSkip: true } }, y: { beginAtZero: true } } });
+      const campaignLabels = cc.labels.map(id => formatCampaignLabel(id));
+      ensureChart(cctx, 'bar', {
+        labels: campaignLabels,
+        datasets: [{ label: 'Records', data: cc.counts, backgroundColor: '#16a34a' }]
+      }, {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { title: (items) => items.map(item => campaignLabels[item.dataIndex]) } }
+        },
+        scales: { x: { ticks: { maxRotation: 0, autoSkip: true } }, y: { beginAtZero: true } }
+      });
 
       const ordered = rows.filter(r => isTrue(r.ordered)).length;
       const notOrdered = rows.length - ordered;
@@ -308,7 +514,52 @@
 
       const ac = topCounts(rows, 'adsetid', 15);
       const actx = document.getElementById('adsetChart');
-      ensureChart(actx, 'bar', { labels: ac.labels, datasets: [{ label: 'Records', data: ac.counts }] }, { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { maxRotation: 0, autoSkip: true } }, y: { beginAtZero: true } } });
+      ensureChart(actx, 'bar', {
+        labels: ac.labels,
+        datasets: [{ label: 'Records', data: ac.counts, backgroundColor: '#0ea5e9' }]
+      }, {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { x: { ticks: { maxRotation: 0, autoSkip: true } }, y: { beginAtZero: true } }
+      });
+
+      const rctx = document.getElementById('ratioChart');
+      const ratioEmpty = document.getElementById('ratioEmpty');
+      if (messageFieldName && masterRows.length){
+        const metrics = aggregateByCampaign(rows)
+          .filter(m => m.messages > 0)
+          .sort((a,b)=>b.messages - a.messages)
+          .slice(0, 10);
+        if (metrics.length){
+          ratioEmpty.classList.add('hidden');
+          rctx.classList.remove('hidden');
+          const labels = metrics.map(m => formatCampaignLabel(m.campaignid));
+          const data = metrics.map(m => Number.isFinite(m.orders / m.messages) ? Number((m.orders / m.messages).toFixed(3)) : 0);
+          ratioChart = ensureChart(rctx, 'bar', {
+            labels,
+            datasets: [{ label: 'Orders per Message', data, backgroundColor: '#C6A044' }]
+          }, {
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: ({ raw, dataIndex }) => `Ratio: ${raw}\n${metrics[dataIndex].orders.toLocaleString()} orders\n${Math.round(metrics[dataIndex].messages).toLocaleString()} messages`
+                }
+              }
+            },
+            scales: { y: { beginAtZero: true }, x: { ticks: { maxRotation: 0, autoSkip: true } } }
+          });
+        } else {
+          if (ratioChart){ ratioChart.destroy(); ratioChart = null; }
+          rctx.classList.add('hidden');
+          ratioEmpty.classList.remove('hidden');
+        }
+      } else {
+        if (ratioChart){ ratioChart.destroy(); ratioChart = null; }
+        rctx.classList.add('hidden');
+        ratioEmpty.classList.remove('hidden');
+      }
     }
 
     function recordCard(r){
@@ -326,7 +577,7 @@
             </div>
           </div>
           <div class="mt-3 flex flex-wrap gap-2">
-            ${badge('Campaign: ' + (r.campaignid ?? '—'))}
+            ${badge('Campaign: ' + formatCampaignLabel(r.campaignid))}
             ${badge('Ad Set: ' + (r.adsetid ?? '—'))}
             ${r.psid != null ? badge('PSID: ' + r.psid) : ''}
           </div>
@@ -346,50 +597,79 @@
     }
 
     function populateDropdowns(rows){
+      const selectedCampaigns = getSelectedNumbers(fCampaign);
       const campaigns = Array.from(new Set(rows.map(r => r.campaignid).filter(v => v !== null && v !== undefined && v !== ''))).sort((a,b)=>a-b);
-      const selectedC = fCampaign.value;
-      fCampaign.innerHTML = '<option value=\"\">All campaigns</option>' + campaigns.map(v => `<option value=\"${v}\">${v}</option>`).join('');
-      if (selectedC && campaigns.includes(Number(selectedC))) fCampaign.value = selectedC;
+      fCampaign.innerHTML = campaigns.map(v => `<option value="${v}">${formatCampaignLabel(v)}</option>`).join('');
+      setSelectedValues(fCampaign, selectedCampaigns.filter(v => campaigns.includes(v)));
 
-      const pool = selectedC ? rows.filter(r => r.campaignid === Number(selectedC)) : rows;
-      const adsets = Array.from(new Set(pool.map(r => r.adsetid).filter(v => v !== null && v !== undefined && v !== ''))).sort((a,b)=>a-b);
-      const selectedS = fAdset.value;
-      fAdset.innerHTML = '<option value=\"\">All ad sets</option>' + adsets.map(v => `<option value=\"${v}\">${v}</option>`).join('');
-      if (selectedS && adsets.includes(Number(selectedS))) fAdset.value = selectedS;
-      else fAdset.value = '';
+      const campaignPool = selectedCampaigns.length ? rows.filter(r => selectedCampaigns.includes(r.campaignid)) : rows;
+      const adsets = Array.from(new Set(campaignPool.map(r => r.adsetid).filter(v => v !== null && v !== undefined && v !== ''))).sort((a,b)=>a-b);
+      const selectedAdsets = getSelectedNumbers(fAdset);
+      fAdset.innerHTML = adsets.map(v => `<option value="${v}">${v}</option>`).join('');
+      setSelectedValues(fAdset, selectedAdsets.filter(v => adsets.includes(v)));
     }
 
-    async function run(){
+    async function ensureDirectory(){
+      await loadCampaignDirectory();
+      if (masterRows.length){
+        messageFieldName = detectMessageField(masterRows);
+      }
+    }
+
+    async function refreshMasterRows(){
+      masterRows = await fetchAll(5000, { applyFilters: false });
+      messageFieldName = detectMessageField(masterRows);
+      populateDropdowns(masterRows);
+    }
+
+    async function run({ refreshDirectory=false } = {}){
       try {
         document.body.style.cursor = 'progress';
-        const rows = await fetchAll(5000);
-        allRows = rows;
+        if (!masterRows.length || refreshDirectory){
+          await refreshMasterRows();
+        } else {
+          populateDropdowns(masterRows);
+        }
+        if (refreshDirectory) await loadCampaignDirectory(true);
+        await ensureDirectory();
+        populateDropdowns(masterRows);
 
-        // Populate dropdowns from data (and re-populate on every run to reflect current filters)
-        populateDropdowns(allRows);
+        const rows = await fetchAll(5000, { applyFilters: true });
+        filteredRows = rows;
 
-        // Server-side filtered result already returned (buildFiltersOn added to queries)
-        const filtered = rows;
-
-        renderKPIs(filtered);
-        renderCharts(filtered);
-        paginatedRows = filtered;
+        renderKPIs(filteredRows);
+        renderCharts(filteredRows);
+        paginatedRows = filteredRows;
         pageIndex = 0;
         renderCards(paginatedRows);
       } catch (err){
         console.error(err);
-        alert('Failed to fetch data. Check Supabase RLS and credentials.\\n' + (err.message || err));
+        alert('Failed to fetch data. Check Supabase RLS and credentials.\n' + (err.message || err));
       } finally {
         document.body.style.cursor = 'default';
       }
     }
 
     // Events
-    refreshBtn.addEventListener('click', () => run());
+    refreshBtn.addEventListener('click', () => run({ refreshDirectory: true }));
     applyBtn.addEventListener('click', () => run());
-    clearBtn.addEventListener('click', () => { [fCampaign,fAdset,fOrdered].forEach(i=> i.value=''); populateDropdowns(allRows); run(); });
-    fCampaign.addEventListener('change', () => { populateDropdowns(allRows); }); // cascade adsets
-    [fCampaign,fAdset,fOrdered].forEach(sel => sel.addEventListener('change', () => run()));
+    clearBtn.addEventListener('click', () => {
+      clearMulti(fCampaign);
+      clearMulti(fAdset);
+      fOrdered.value = '';
+      populateDropdowns(masterRows);
+      run();
+    });
+    fCampaign.addEventListener('change', () => {
+      populateDropdowns(masterRows);
+      run();
+    });
+    fAdset.addEventListener('change', () => run());
+    fOrdered.addEventListener('change', () => run());
+    loadMoreBtn.addEventListener('click', () => {
+      pageIndex += 1;
+      renderCards(paginatedRows);
+    });
 
     // Boot
     run();
