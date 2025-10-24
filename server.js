@@ -6,8 +6,10 @@ const app = express();
 app.disable('x-powered-by');
 app.use(compression());
 
-// serve all static assets from the repo root
-app.use(express.static(__dirname, {
+const PUBLIC_DIR = path.join(__dirname, 'public');
+
+// serve all static assets from the public directory
+app.use(express.static(PUBLIC_DIR, {
   setHeaders(res, filePath) {
     if (/\.html?$/.test(filePath)) {
       res.setHeader('Cache-Control', 'no-store');
@@ -22,7 +24,7 @@ app.get('/healthz', (_req, res) => res.status(200).send('ok'));
 
 // send index.html for all other routes
 app.get('*', (_req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(PUBLIC_DIR, 'index.html'));
 });
 
 const PORT = process.env.PORT || 3000;
