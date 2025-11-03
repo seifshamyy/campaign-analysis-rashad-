@@ -117,6 +117,34 @@
           <label class="block text-xs font-semibold text-emerald-900/80 mb-1">Ad Sets</label>
           <div id="f-adsetid" class="checkbox-group" role="group" aria-label="Ad set filters"></div>
         </div>
+        <div class="sm:col-span-2 lg:col-span-2 space-y-3">
+          <div>
+            <label class="block text-xs font-semibold text-emerald-900/80 mb-1">Time window</label>
+            <select id="f-time-preset" class="w-full rounded-xl border border-emerald-100 bg-emerald-50/40 px-3 py-2 focus:ring-2 focus:ring-brand-gold/50 outline-none">
+              <option value="">Any time</option>
+              <option value="last_hour">Last hour</option>
+              <option value="last_6_hours">Last 6 hours</option>
+              <option value="last_24_hours">Last 24 hours</option>
+              <option value="last_3_days">Last 3 days</option>
+              <option value="last_7_days">Last 7 days</option>
+              <option value="last_30_days">Last 30 days</option>
+              <option value="today">Today</option>
+              <option value="yesterday">Yesterday</option>
+              <option value="custom">Custom range</option>
+            </select>
+          </div>
+          <div class="grid sm:grid-cols-2 gap-3">
+            <label class="block">
+              <span class="block text-[11px] font-semibold text-emerald-900/70 mb-1">Start</span>
+              <input id="f-time-start" type="datetime-local" class="w-full rounded-xl border border-emerald-100 bg-emerald-50/40 px-3 py-2 focus:ring-2 focus:ring-brand-gold/50 outline-none" />
+            </label>
+            <label class="block">
+              <span class="block text-[11px] font-semibold text-emerald-900/70 mb-1">End</span>
+              <input id="f-time-end" type="datetime-local" class="w-full rounded-xl border border-emerald-100 bg-emerald-50/40 px-3 py-2 focus:ring-2 focus:ring-brand-gold/50 outline-none" />
+            </label>
+          </div>
+          <p class="text-[11px] text-emerald-800/70">Quick ranges apply instantly. Custom start/end values override the preset when provided. Times are interpreted in your local timezone.</p>
+        </div>
         <div class="sm:col-span-2">
           <label class="block text-xs font-semibold text-emerald-900/80 mb-1">Conversion status</label>
           <select id="f-ordered" class="w-full rounded-xl border border-emerald-100 bg-emerald-50/40 px-3 py-2 focus:ring-2 focus:ring-brand-gold/50 outline-none">
@@ -214,6 +242,9 @@
     const fCampaign  = $('#f-campaignid');
     const fAdset     = $('#f-adsetid');
     const fOrdered   = $('#f-ordered');
+    const fTimePreset= $('#f-time-preset');
+    const fTimeStart = $('#f-time-start');
+    const fTimeEnd   = $('#f-time-end');
 
     // Charts
     let campaignChart, orderedChart, adsetChart, ratioChart;
@@ -287,10 +318,107 @@
       return stats;
     }
 
+    const TIMESTAMP_KEYS = ['time', 'TIME', 'timestamp', 'Timestamp', 'created_at', 'createdAt', 'created_time', 'createdTime', 'inserted_at', 'insertedAt', 'updated_at', 'updatedAt'];
+
+    function parseTimestamp(value){
+      if (!value && value !== 0) return null;
+      if (value instanceof Date) {
+        return isNaN(value.getTime()) ? null : value;
+      }
+      if (typeof value === 'number') {
+        const date = new Date(value);
+        return isNaN(date.getTime()) ? null : date;
+      }
+      if (typeof value === 'string') {
+        const trimmed = value.trim();
+        if (!trimmed) return null;
+        const normalised = trimmed.includes('T') ? trimmed : trimmed.replace(/\s+/, 'T');
+        const date = new Date(normalised);
+        if (!isNaN(date.getTime())) return date;
+        const fallback = new Date(Date.parse(trimmed.replace(/\s+/, 'T')));
+        return isNaN(fallback.getTime()) ? null : fallback;
+      }
+      return null;
+    }
+
+    function getRowTimestamp(row){
+      if (!row || typeof row !== 'object') return null;
+      for (const key of TIMESTAMP_KEYS){
+        if (key in row){
+          const parsed = parseTimestamp(row[key]);
+          if (parsed) return parsed;
+        }
+      }
+      return null;
+    }
+
+    function parseDateInput(value, { isEnd = false } = {}){
+      if (!value) return null;
+      const date = new Date(value);
+      if (isNaN(date.getTime())) return null;
+      if (isEnd && value.length <= 16){
+        date.setSeconds(59, 999);
+      }
+      return date;
+    }
+
+    function computePresetRange(preset){
+      if (!preset) return { start: null, end: null };
+      const now = new Date();
+      const hour = 60 * 60 * 1000;
+      switch (preset){
+        case 'last_hour':
+          return { start: new Date(now.getTime() - hour), end: now };
+        case 'last_6_hours':
+          return { start: new Date(now.getTime() - 6 * hour), end: now };
+        case 'last_24_hours':
+          return { start: new Date(now.getTime() - 24 * hour), end: now };
+        case 'last_3_days':
+          return { start: new Date(now.getTime() - 3 * 24 * hour), end: now };
+        case 'last_7_days':
+          return { start: new Date(now.getTime() - 7 * 24 * hour), end: now };
+        case 'last_30_days':
+          return { start: new Date(now.getTime() - 30 * 24 * hour), end: now };
+        case 'today': {
+          const startOfDay = new Date(now);
+          startOfDay.setHours(0, 0, 0, 0);
+          const endOfDay = new Date(now);
+          endOfDay.setHours(23, 59, 59, 999);
+          return { start: startOfDay, end: endOfDay };
+        }
+        case 'yesterday': {
+          const startOfDay = new Date(now);
+          startOfDay.setDate(now.getDate() - 1);
+          startOfDay.setHours(0, 0, 0, 0);
+          const endOfDay = new Date(startOfDay);
+          endOfDay.setHours(23, 59, 59, 999);
+          return { start: startOfDay, end: endOfDay };
+        }
+        case 'custom':
+        default:
+          return { start: null, end: null };
+      }
+    }
+
+    function resolveTimeRange(){
+      const preset = fTimePreset ? fTimePreset.value : '';
+      const presetRange = computePresetRange(preset);
+      let { start, end } = presetRange;
+      const customStart = parseDateInput(fTimeStart ? fTimeStart.value : '');
+      const customEnd = parseDateInput(fTimeEnd ? fTimeEnd.value : '', { isEnd: true });
+      if (customStart) start = customStart;
+      if (customEnd) end = customEnd;
+      if (start && end && start > end){
+        return { start: end, end: start };
+      }
+      return { start, end };
+    }
+
     function applyFilters(rows){
       const selectedCampaigns = new Set(getSelectedStrings(fCampaign));
       const selectedAdsets = new Set(getSelectedStrings(fAdset));
       const orderedFilter = fOrdered.value;
+      const { start: startTime, end: endTime } = resolveTimeRange();
 
       return rows.filter((row) => {
         const campaignId = row.campaignid !== null && row.campaignid !== undefined ? String(row.campaignid) : null;
@@ -301,6 +429,13 @@
 
         if (orderedFilter === 'true' && !isTrue(row.ordered)) return false;
         if (orderedFilter === 'false' && isTrue(row.ordered)) return false;
+
+        if (startTime || endTime){
+          const timestamp = getRowTimestamp(row);
+          if (!timestamp) return false;
+          if (startTime && timestamp < startTime) return false;
+          if (endTime && timestamp > endTime) return false;
+        }
 
         return true;
       });
@@ -697,9 +832,17 @@
       clearMultiselect(fCampaign);
       clearMultiselect(fAdset);
       fOrdered.value = '';
+      if (fTimePreset) fTimePreset.value = '';
+      if (fTimeStart) fTimeStart.value = '';
+      if (fTimeEnd) fTimeEnd.value = '';
       run();
     });
-    [fCampaign, fAdset, fOrdered].forEach((select) => select.addEventListener('change', () => run()));
+    [fCampaign, fAdset, fOrdered, fTimePreset, fTimeStart, fTimeEnd]
+      .filter(Boolean)
+      .forEach((input) => input.addEventListener('change', () => run()));
+    [fTimeStart, fTimeEnd]
+      .filter(Boolean)
+      .forEach((input) => input.addEventListener('input', () => run()));
     loadMoreBtn.addEventListener('click', () => {
       pageIndex += 1;
       renderCards(paginatedRows);
