@@ -226,6 +226,7 @@
     const SUPABASE_URL = 'https://whmbrguzumyatnslzfsq.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndobWJyZ3V6dW15YXRuc2x6ZnNxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzNTE2ODksImV4cCI6MjA2NDkyNzY4OX0.xcSogaAHv8uQzhFgEDZ1niFx8lirLiBRvkPpMF174YM';
     const TABLE = 'ads_damtonda';
+    const SELECT_COLS = 'id, psid::text, adid::text, campaignid::text, adsetid::text, ordered, "TIME"';
 
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: false } });
 
@@ -660,7 +661,7 @@
     function populateDropdowns(rows){
       const campaigns = Array.from(new Set(rows.map(r => r.campaignid).filter(v => v !== null && v !== undefined && v !== '')))
         .map((value) => String(value))
-        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+        .sort((a, b) => a.localeCompare(b));
 
       renderCheckboxGroup(fCampaign, campaigns, {
         labelGetter: (campaignId) => formatCampaignLabel(campaignId),
@@ -676,7 +677,7 @@
       });
       const adsets = Array.from(new Set(adsetPool.map(r => r.adsetid).filter(v => v !== null && v !== undefined && v !== '')))
         .map((value) => String(value))
-        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+        .sort((a, b) => a.localeCompare(b));
 
       renderCheckboxGroup(fAdset, adsets, {
         labelGetter: (value) => value,
@@ -684,10 +685,26 @@
       });
     }
 
+    function assertIdStringTypes(data){
+      const sample = Array.isArray(data) ? data[0] : null;
+      if (!sample) return;
+      const idFields = ['psid', 'adid', 'campaignid', 'adsetid'];
+      for (const field of idFields){
+        if (field in sample && sample[field] != null && typeof sample[field] !== 'string'){
+          console.warn('ID arrived non-string:', field, sample[field], typeof sample[field]);
+        }
+      }
+    }
+
     async function trySupabaseChunk(from, to){
       try {
-        const { data, error } = await supabase.from(TABLE).select('*').order('id', { ascending: false }).range(from, to);
+        const { data, error } = await supabase
+          .from(TABLE)
+          .select(SELECT_COLS)
+          .order('id', { ascending: false })
+          .range(from, to);
         if (error) throw error;
+        assertIdStringTypes(data);
         return data;
       } catch (error){
         console.warn('[supabase-js] chunk err:', error?.message || error);
@@ -696,18 +713,24 @@
     }
 
     async function tryRestChunk(from, to){
-      const params = new URLSearchParams({ select: '*', order: 'id.desc' });
+      const params = new URLSearchParams({
+        select: SELECT_COLS,
+        order: 'id.desc',
+        offset: String(from),
+        limit: String(to - from + 1),
+      });
       const url = `${SUPABASE_URL}/rest/v1/${TABLE}?` + params.toString();
       const res = await fetch(url, {
         headers: {
           apikey: SUPABASE_ANON_KEY,
           Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-          Range: `${from}-${to}`,
           Accept: 'application/json'
         }
       });
       if (!res.ok) throw new Error(`REST ${res.status}`);
-      return await res.json();
+      const data = await res.json();
+      assertIdStringTypes(data);
+      return data;
     }
 
     async function fetchAll(limit = 5000){
